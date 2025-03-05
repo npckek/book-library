@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import RentReminder from "./RentReminder";
+import Header from "./Header";
 
 const ProfilePage = () => {
     const [user, setUser] = useState(null);
-    const [purchases, setPurchases] = useState([]);
-    const [rents, setRents] = useState([]);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -14,8 +13,6 @@ const ProfilePage = () => {
             navigate("/login"); // Если нет пользователя, отправляем на страницу входа
         } else {
             setUser(currentUser);
-            setPurchases(JSON.parse(localStorage.getItem("purchases")) || []);
-            setRents(JSON.parse(localStorage.getItem("rents")) || []);
         }
     }, [navigate]);
 
@@ -24,29 +21,32 @@ const ProfilePage = () => {
         navigate("/login");
     };
 
-    const handleRemovePurchase = (id) => {
-        const updatedPurchases = purchases.filter((book) => book.id !== id);
-        setPurchases(updatedPurchases);
-        localStorage.setItem("purchases", JSON.stringify(updatedPurchases));
+    const handleRemovePurchase = (bookId) => {
+        const updatedPurchases = user.purchases.filter((book) => book.bookId !== bookId);
+        user.purchases = updatedPurchases;
+        localStorage.setItem("currentUser", JSON.stringify(user));
+        setUser({ ...user });
     };
 
-    const handleRemoveRent = (id) => {
-        const updatedRents = rents.filter((book) => book.id !== id);
-        setRents(updatedRents);
-        localStorage.setItem("rents", JSON.stringify(updatedRents));
+    const handleRemoveRent = (bookId) => {
+        const updatedRents = user.rents.filter((book) => book.bookId !== bookId);
+        user.rents = updatedRents;
+        localStorage.setItem("currentUser", JSON.stringify(user));
+        setUser({ ...user });
     };
 
     return (
-        <div className="p-6 max-w-2xl mx-auto">
+        <div className="p-6 max-w-2xl mx-auto text-text">
             <h2 className="text-3xl">Профиль пользователя</h2>
+            <Header/>
             {user && <p className="text-gray-600">Вы вошли как: {user.username}</p>}
 
             <h3 className="text-xl mt-4">Купленные книги</h3>
-            {purchases.length > 0 ? (
-                purchases.map((book) => (
-                    <div key={book.id} className="p-4 border border-gray-200 rounded-md my-2">
+            {user?.purchases?.length > 0 ? (
+                user.purchases.map((book) => (
+                    <div key={book.bookId} className="p-4 border border-border bg-block rounded-md my-2">
                         <h4>{book.title}</h4>
-                        <button className="bg-red-500 text-white p-2 rounded-md mt-2" onClick={() => handleRemovePurchase(book.id)}>
+                        <button className="bg-red-500 text-white p-2 rounded-md mt-2" onClick={() => handleRemovePurchase(book.bookId)}>
                             Удалить
                         </button>
                     </div>
@@ -56,14 +56,14 @@ const ProfilePage = () => {
             )}
 
             <h3 className="text-xl mt-4">Арендованные книги</h3>
-            {rents.length > 0 ? (
-                rents.map((book) => (
-                    <div key={book.id} className="p-4 border border-gray-200 rounded-md my-2">
+            {user?.rents?.length > 0 ? (
+                user.rents.map((book) => (
+                    <div key={book.bookId} className="p-4 border border-border bg-block rounded-md my-2">
                         <h4>{book.title}</h4>
                         <RentReminder expirationDate={book.expirationDate} />
                         <p>Срок аренды: {new Date(book.rentalDate).toLocaleDateString()} - {new Date(book.expirationDate).toLocaleDateString()}</p>
-                        {book.expired && <p className="text-red-500">Срок аренды истёк!</p>}
-                        <button className="bg-red-500 text-white p-2 rounded-md mt-2" onClick={() => handleRemoveRent(book.id)}>
+                        {new Date(book.expirationDate) < new Date() && <p className="text-red-500">Срок аренды истёк!</p>}
+                        <button className="bg-red-500 text-white p-2 rounded-md mt-2" onClick={() => handleRemoveRent(book.bookId)}>
                             Удалить
                         </button>
                     </div>

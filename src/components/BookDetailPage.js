@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import Header from "./Header";
 
 const BookDetailPage = () => {
     const { id } = useParams();
@@ -13,7 +14,10 @@ const BookDetailPage = () => {
     }, [id]);
 
     const handleRent = () => {
-        if (!book) return;
+        if (!book || !book.available) {
+            alert('Книга недоступна для аренды.');
+            return;
+        }
 
         const currentUser = JSON.parse(localStorage.getItem('currentUser'));
         if (!currentUser) {
@@ -25,21 +29,33 @@ const BookDetailPage = () => {
         const expirationDate = new Date(rentalDate);
         expirationDate.setMonth(expirationDate.getMonth() + rentalDuration);
 
-        const rents = JSON.parse(localStorage.getItem("rents")) || [];
         const rent = {
-            ...book,
+            bookId: book.id,
+            title: book.title,
             rentalDate,
             rentalDuration,
             expirationDate,
-            renter: currentUser.id
         };
-        localStorage.setItem("rents", JSON.stringify([...rents, rent]));
+
+        // Обновляем данные пользователя
+        currentUser.rents = [...(currentUser.rents || []), rent];
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+        // Обновляем данные в массиве пользователей
+        const users = JSON.parse(localStorage.getItem('users')) || [];
+        const updatedUsers = users.map(user =>
+            user.id === currentUser.id ? currentUser : user
+        );
+        localStorage.setItem('users', JSON.stringify(updatedUsers));
 
         alert(`Вы арендовали "${book.title}" на ${rentalDuration} месяц(ев)!`);
     };
 
     const handleBuy = () => {
-        if (!book) return;
+        if (!book || !book.available) {
+            alert('Книга недоступна для покупки.');
+            return;
+        }
 
         const currentUser = JSON.parse(localStorage.getItem('currentUser'));
         if (!currentUser) {
@@ -47,19 +63,29 @@ const BookDetailPage = () => {
             return;
         }
 
-        const purchases = JSON.parse(localStorage.getItem("purchases")) || [];
         const purchase = {
-            ...book,
+            bookId: book.id,
+            title: book.title,
             purchaseDate: new Date(),
-            buyer: currentUser.id
         };
-        localStorage.setItem("purchases", JSON.stringify([...purchases, purchase]));
+
+        // Обновляем данные пользователя
+        currentUser.purchases = [...(currentUser.purchases || []), purchase];
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+        // Обновляем данные в массиве пользователей
+        const users = JSON.parse(localStorage.getItem('users')) || [];
+        const updatedUsers = users.map(user =>
+            user.id === currentUser.id ? currentUser : user
+        );
+        localStorage.setItem('users', JSON.stringify(updatedUsers));
 
         alert(`Вы купили книгу "${book.title}" за ${book.price}₽!`);
     };
 
     return (
-        <div className="p-6 max-w-2xl mx-auto">
+        <div className="p-6 max-w-2xl mx-auto text-text">
+            <Header />
             {book ? (
                 <>
                     <h2 className="text-3xl">{book.title}</h2>
@@ -67,13 +93,15 @@ const BookDetailPage = () => {
                     <p>Год написания: {book.year}</p>
                     <p>Категория: {book.category}</p>
                     <p>Цена: {book.price}₽</p>
+                    {!book.available && <p className="text-red-500">Книга недоступна для аренды или покупки.</p>}
 
-                    <div className="mt-4">
+                    <div className="mt-4 text-text">
                         <h3 className="text-xl">Выберите срок аренды:</h3>
                         <select
-                            className="border p-2 m-1"
+                            className="border p-2 m-1 border-border bg-block"
                             value={rentalDuration}
                             onChange={(e) => setRentalDuration(parseInt(e.target.value))}
+                            disabled={!book.available}
                         >
                             <option value={1}>1 месяц</option>
                             <option value={2}>2 месяца</option>
@@ -85,12 +113,14 @@ const BookDetailPage = () => {
                         <button
                             onClick={handleRent}
                             className="bg-blue-500 text-white p-2 rounded-md"
+                            disabled={!book.available}
                         >
                             Арендовать
                         </button>
                         <button
                             onClick={handleBuy}
                             className="bg-green-500 text-white p-2 rounded-md"
+                            disabled={!book.available}
                         >
                             Купить
                         </button>
