@@ -11,6 +11,7 @@ const AdminPanel = () => {
         author: "",
         year: "",
         category: "",
+        description: "",
         price: "",
         available: true,
     });
@@ -71,7 +72,7 @@ const AdminPanel = () => {
         setBooks(updatedBooks);
         localStorage.setItem("books", JSON.stringify(updatedBooks));
 
-        setNewBook({ id: nanoid(10), title: "", author: "", year: "", category: "", price: "", available: true });
+        setNewBook({ id: nanoid(10), title: "", author: "", description: "", year: "", category: "", price: "", available: true });
         setEditingBook(null);
     };
 
@@ -96,7 +97,7 @@ const AdminPanel = () => {
 
     const handleCancelEdit = () => {
         setEditingBook(null);
-        setNewBook({ id: nanoid(10), title: "", author: "", year: "", category: "", price: "", available: true });
+        setNewBook({ id: nanoid(10), title: "", author: "", description: "", year: "", category: "", price: "", available: true });
     };
 
     const handleUserToggle = (user) => {
@@ -205,13 +206,18 @@ const AdminPanel = () => {
                             <option key={index} value={suggestion} />
                         ))}
                     </datalist>
-                    <div className="mt-4 p-4 border border-border bg-block rounded-md">
+                    <div className="mt-4 p-4 border border-border bg-block rounded-md flex-nowrap grid grid-cols-2 items-center">
                         <h3 className="text-xl mb-2">{editingBook ? "Редактировать книгу" : "Добавить книгу"}</h3>
                         <input type="text" name="title" placeholder="Название" value={newBook.title} onChange={handleChange} className="border border-border bg-block p-2 m-1" />
                         <input type="text" name="author" placeholder="Автор" value={newBook.author} onChange={handleChange} className="border border-border bg-block p-2 m-1" />
+                        <textarea name="description" placeholder="Описание" value={newBook.description} onChange={handleChange} className="border border-border bg-block p-2 m-1" />
                         <input type="number" name="year" placeholder="Год" value={newBook.year} onChange={handleChange} className="border border-border bg-block p-2 m-1" />
                         <input type="text" name="category" placeholder="Категория" value={newBook.category} onChange={handleChange} className="border border-border bg-block p-2 m-1" />
                         <input type="number" name="price" placeholder="Цена" value={newBook.price} onChange={handleChange} className="border border-border bg-block p-2 m-1" />
+                        <select className='bg-block border-border border p-2 m-1 text-gray-400' value={newBook.available} onChange={(e) => editBook(newBook.id, "available", e.target.value === "true")}>
+                            <option value="true">Доступно</option>
+                            <option value="false">Недоступно</option>
+                        </select>
                         <button className="bg-green-500 text-white p-2 mt-2 rounded-md" onClick={addBook}>
                             {editingBook ? "Сохранить" : "Добавить"}
                         </button>
@@ -228,16 +234,17 @@ const AdminPanel = () => {
                             <div>
                                 <p>{book.title}</p>
                                 <p>{book.author}</p>
+                                <p>{book.description}</p>
                                 <p>{book.year}</p>
                                 <p>{book.category}</p>
                                 <p>{book.price}₽</p>
                                 <p>{book.available ? "Доступно" : "Недоступно"}</p>
                             </div>
-                            <div>
-                                <button className="bg-blue-500 text-white p-2 rounded-md mr-2" onClick={() => handleEditClick(book)}>
+                            <div >
+                                <button className="bg-blue-500 text-white p-2 rounded-md m-2 " onClick={() => handleEditClick(book)}>
                                     Редактировать
                                 </button>
-                                <button className="bg-red-500 text-white p-2 rounded-md" onClick={() => deleteBook(book.id)}>
+                                <button className="bg-red-500 text-white p-2 rounded-md m-2" onClick={() => deleteBook(book.id)}>
                                     Удалить
                                 </button>
                             </div>

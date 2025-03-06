@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {useNavigate} from "react-router-dom";
 import { booksData } from "../util/initData";
-import Switcher from "./Switcher";
 import Header from "./Header"; // Мы создадим этот файл для базы данных
 
 const UserInterface = () => {
@@ -59,56 +58,60 @@ const UserInterface = () => {
 
     return (
         <div className="p-4">
-            <h1 className="text-2xl mb-4 text-text">Библиотека книг</h1>
             <Header/>
-            {/* Фильтрация по категориям */}
-            <div className="mb-4">
-                <label htmlFor="category" className="mr-2 text-text">Категория:</label>
-                <select id="category" onChange={handleCategoryChange} value={categoryFilter} className='bg-block text-text border border-border'>
-                    <option value="all">Все категории</option>
-                    {categories.map((category, index) => (
-                        <option key={index} value={category} >{category}</option>
-                    ))}
-                </select>
+            <h1 className="text-2xl mb-4 text-text">Библиотека книг</h1>
+
+            <div className="flex flex-wrap flex-row justify-between items-center">
+                {/* Фильтрация по категориям */}
+                <div className="mb-4 ">
+                    <label htmlFor="category" className="mr-2 text-text">Категория:</label>
+                    <select id="category" onChange={handleCategoryChange} value={categoryFilter} className='bg-block p-3 text-text border border-border'>
+                        <option value="all">Все категории</option>
+                        {categories.map((category, index) => (
+                            <option key={index} value={category} >{category}</option>
+                        ))}
+                    </select>
+                </div>
+
+                {/* Фильтрация по авторам */}
+                <div className="mb-4">
+                    <label htmlFor="author" className="mr-2 text-text">Автор:</label>
+                    <select id="author" onChange={handleAuthorChange} value={authorFilter} className='bg-block p-3 text-text border border-border'>
+                        <option value="all">Все авторы</option>
+                        {authors.map((author, index) => (
+                            <option key={index} value={author}>{author}</option>
+                        ))}
+                    </select>
+                </div>
+
+                {/* Фильтрация по году */}
+                <div className="mb-4">
+                    <label htmlFor="year" className="mr-2 text-text">Год написания:</label>
+                    <input
+                        id="year"
+                        type="number"
+                        placeholder="Введите год"
+                        value={yearFilter}
+                        onChange={handleYearChange}
+                        className="border p-2 border-border bg-block text-text appearance-none"
+                    />
+                </div>
+
+                {/* Сортировка по цене */}
+                <div className="mb-4">
+                    <label htmlFor="priceOrder" className="mr-2 text-text">Цена:</label>
+                    <select id="priceOrder" onChange={handlePriceOrderChange} value={priceOrder} className='bg-block p-3 text-text border border-border' >
+                        <option value="asc">По возрастанию</option>
+                        <option value="desc">По убыванию</option>
+                    </select>
+                </div>
             </div>
 
-            {/* Фильтрация по авторам */}
-            <div className="mb-4">
-                <label htmlFor="author" className="mr-2 text-text">Автор:</label>
-                <select id="author" onChange={handleAuthorChange} value={authorFilter} className='bg-block text-text border border-border'>
-                    <option value="all">Все авторы</option>
-                    {authors.map((author, index) => (
-                        <option key={index} value={author}>{author}</option>
-                    ))}
-                </select>
-            </div>
-
-            {/* Фильтрация по году */}
-            <div className="mb-4">
-                <label htmlFor="year" className="mr-2 text-text">Год написания:</label>
-                <input
-                    id="year"
-                    type="number"
-                    placeholder="Введите год"
-                    value={yearFilter}
-                    onChange={handleYearChange}
-                    className="border p-2 border-border bg-block text-text"
-                />
-            </div>
-
-            {/* Сортировка по цене */}
-            <div className="mb-4">
-                <label htmlFor="priceOrder" className="mr-2 text-text">Цена:</label>
-                <select id="priceOrder" onChange={handlePriceOrderChange} value={priceOrder} className='bg-block text-text border border-border' >
-                    <option value="asc">По возрастанию</option>
-                    <option value="desc">По убыванию</option>
-                </select>
-            </div>
 
             {/* Отображение книг */}
             <div className="grid grid-cols-3 gap-4">
                 {sortedBooks.map((book) => (
-                    <div key={book.id} className="p-4 border border-gray-200 rounded-md border-border bg-block text-text">
+                    <div key={book.id} className="p-4 border border-border rounded-md bg-block text-text">
                         <h2 className="text-xl">{book.title}</h2>
                         <p>Автор: {book.author}</p>
                         <p>Год: {book.year}</p>

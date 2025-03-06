@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import Header from "./Header";
 
 const BookDetailPage = () => {
     const { id } = useParams();
+    const navigate = useNavigate();
     const [book, setBook] = useState(null);
     const [rentalDuration, setRentalDuration] = useState(1); // по умолчанию на 1 месяц
 
@@ -84,52 +85,64 @@ const BookDetailPage = () => {
     };
 
     return (
-        <div className="p-6 max-w-2xl mx-auto text-text">
-            <Header />
-            {book ? (
-                <>
-                    <h2 className="text-3xl">{book.title}</h2>
-                    <p>Автор: {book.author}</p>
-                    <p>Год написания: {book.year}</p>
-                    <p>Категория: {book.category}</p>
-                    <p>Цена: {book.price}₽</p>
-                    {!book.available && <p className="text-red-500">Книга недоступна для аренды или покупки.</p>}
+        <>
+            <div className="p-4 ">
+                <Header />
+            </div>
+            <button className="bg-gray-600 text-white p-2 rounded-md mx-4" onClick={() => navigate(-1)}>
+                Назад
+            </button>
 
-                    <div className="mt-4 text-text">
-                        <h3 className="text-xl">Выберите срок аренды:</h3>
-                        <select
-                            className="border p-2 m-1 border-border bg-block"
-                            value={rentalDuration}
-                            onChange={(e) => setRentalDuration(parseInt(e.target.value))}
-                            disabled={!book.available}
-                        >
-                            <option value={1}>1 месяц</option>
-                            <option value={2}>2 месяца</option>
-                            <option value={3}>3 месяца</option>
-                        </select>
-                    </div>
 
-                    <div className="mt-4 flex gap-4">
-                        <button
-                            onClick={handleRent}
-                            className="bg-blue-500 text-white p-2 rounded-md"
-                            disabled={!book.available}
-                        >
-                            Арендовать
-                        </button>
-                        <button
-                            onClick={handleBuy}
-                            className="bg-green-500 text-white p-2 rounded-md"
-                            disabled={!book.available}
-                        >
-                            Купить
-                        </button>
-                    </div>
-                </>
-            ) : (
-                <p>Загрузка...</p>
-            )}
-        </div>
+            <div className="p-6 max-w-2xl mx-auto text-text">
+                <p></p>
+                {book ? (
+                    <>
+                        <h2 className="text-3xl">{book.title}</h2>
+                        <p>Автор: {book.author}</p>
+                        <p>Год написания: {book.year}</p>
+                        <p>Категория: {book.category}</p>
+                        <p>Описание: {book.description}</p>
+                        <p>Цена: {book.price}₽</p>
+                        {!book.available && <p className="text-red-500">Книга недоступна для аренды или покупки.</p>}
+
+                        <div className="mt-4 text-text">
+                            <h3 className="text-xl">Выберите срок аренды:</h3>
+                            <select
+                                className="border p-2 m-1 border-border bg-block"
+                                value={rentalDuration}
+                                onChange={(e) => setRentalDuration(parseInt(e.target.value))}
+                                disabled={!book.available}
+                            >
+                                <option value={1}>1 месяц</option>
+                                <option value={2}>2 месяца</option>
+                                <option value={3}>3 месяца</option>
+                            </select>
+                        </div>
+
+                        <div className="mt-4 flex gap-4">
+                            <button
+                                onClick={handleRent}
+                                className="bg-blue-500 text-white p-2 rounded-md"
+                                disabled={!book.available}
+                            >
+                                Арендовать
+                            </button>
+                            <button
+                                onClick={handleBuy}
+                                className="bg-green-500 text-white p-2 rounded-md"
+                                disabled={!book.available}
+                            >
+                                Купить
+                            </button>
+                        </div>
+                    </>
+                ) : (
+                    <p>Загрузка...</p>
+                )}
+            </div>
+        </>
+
     );
 };
 

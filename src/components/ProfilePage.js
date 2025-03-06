@@ -5,6 +5,7 @@ import Header from "./Header";
 
 const ProfilePage = () => {
     const [user, setUser] = useState(null);
+    const [users, setUsers] = useState([]);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -14,6 +15,9 @@ const ProfilePage = () => {
         } else {
             setUser(currentUser);
         }
+
+        const storedUsers = JSON.parse(localStorage.getItem("users")) || [];
+        setUsers(storedUsers);
     }, [navigate]);
 
     const handleLogout = () => {
@@ -26,6 +30,13 @@ const ProfilePage = () => {
         user.purchases = updatedPurchases;
         localStorage.setItem("currentUser", JSON.stringify(user));
         setUser({ ...user });
+
+        // Обновляем данные в массиве users
+        const updatedUsers = users.map((u) =>
+            u.id === user.id ? { ...u, purchases: updatedPurchases } : u
+        );
+        localStorage.setItem("users", JSON.stringify(updatedUsers));
+        setUsers(updatedUsers);
     };
 
     const handleRemoveRent = (bookId) => {
@@ -33,12 +44,22 @@ const ProfilePage = () => {
         user.rents = updatedRents;
         localStorage.setItem("currentUser", JSON.stringify(user));
         setUser({ ...user });
+
+        // Обновляем данные в массиве users
+        const updatedUsers = users.map((u) =>
+            u.id === user.id ? { ...u, rents: updatedRents } : u
+        );
+        localStorage.setItem("users", JSON.stringify(updatedUsers));
+        setUsers(updatedUsers);
     };
 
     return (
-        <div className="p-6 max-w-2xl mx-auto text-text">
+        <>
+            <div className='p-4'>
+                <Header/>
+            </div>
+            <div className="p-6 max-w-2xl mx-auto text-text">
             <h2 className="text-3xl">Профиль пользователя</h2>
-            <Header/>
             {user && <p className="text-gray-600">Вы вошли как: {user.username}</p>}
 
             <h3 className="text-xl mt-4">Купленные книги</h3>
@@ -76,6 +97,8 @@ const ProfilePage = () => {
                 Выйти
             </button>
         </div>
+        </>
+
     );
 };
 
